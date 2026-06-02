@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 @Component
-public class CustomAccessDeniedHandler implements AccessDeniedHandler {
+public class    CustomAccessDeniedHandler implements AccessDeniedHandler {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -25,3 +25,4 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
         response.getWriter().write(objectMapper.writeValueAsString(apiResponse));
     }
 }
+
