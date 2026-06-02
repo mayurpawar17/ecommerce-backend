@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/categories")
 public class CategoryController {
 
     private final CategoryService categoryService;
@@ -28,7 +28,7 @@ public class CategoryController {
     }
 
     // Create Category with JSR-380 validation
-    @PostMapping("/categories")
+    @PostMapping
     public ResponseEntity<ApiResponse<CategoryResponseDTO>> createCategory(@Valid @RequestBody CategoryRequestDTO requestDTO) {
         CategoryResponseDTO createdCategory = categoryService.createCategory(requestDTO);
         ApiResponse<CategoryResponseDTO> response = ApiResponse.success("Category created successfully", createdCategory);
@@ -36,7 +36,7 @@ public class CategoryController {
     }
 
     // Get Single Category
-    @GetMapping("/categories/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<CategoryResponseDTO>> getCategoryById(@PathVariable Long id) {
         CategoryResponseDTO category = categoryService.getCategoryById(id);
         ApiResponse<CategoryResponseDTO> response = ApiResponse.success("Category found successfully", category);
@@ -44,7 +44,7 @@ public class CategoryController {
     }
 
     // Get All Categories with Pagination & Sort properties
-    @GetMapping("/categories")
+    @GetMapping
     public ResponseEntity<ApiResponse<List<CategoryResponseDTO>>> getAllCategories(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "id") String sortBy, @RequestParam(defaultValue = "asc") String sortDir) {
 
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
@@ -64,7 +64,7 @@ public class CategoryController {
     }
 
     // Update Category
-    @PutMapping("/categories/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<CategoryResponseDTO>> updateCategory(@PathVariable Long id, @Valid @RequestBody CategoryRequestDTO requestDTO) {
         CategoryResponseDTO updatedCategory = categoryService.updateCategory(id, requestDTO);
         ApiResponse<CategoryResponseDTO> response = ApiResponse.success("Category updated successfully", updatedCategory);
@@ -72,12 +72,10 @@ public class CategoryController {
     }
 
     // Delete Category
-    @DeleteMapping("/categories/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<String>> deleteCategory(@PathVariable Long id) {
         categoryService.deleteCategory(id);
-
         ApiResponse<String> response = ApiResponse.success("Category deleted successfully", "Deleted");
-
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

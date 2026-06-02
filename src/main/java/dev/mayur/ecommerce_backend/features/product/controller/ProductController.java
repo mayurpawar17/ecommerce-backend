@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/products")
 public class ProductController {
 
     private final ProductService productService;
@@ -27,7 +27,7 @@ public class ProductController {
     }
 
     // Create Product with Validation
-    @PostMapping("/products")
+    @PostMapping
     public ResponseEntity<ApiResponse<ProductResponseDTO>> createProduct(@Valid @RequestBody ProductRequestDTO requestDTO) {
         ProductResponseDTO createdProduct = productService.createProduct(requestDTO);
 
@@ -37,7 +37,7 @@ public class ProductController {
     }
 
     // Get Single Product by ID
-    @GetMapping("/products/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<ProductResponseDTO>> getProductById(@PathVariable Long id) {
         ProductResponseDTO product = productService.getProductById(id);
         ApiResponse<ProductResponseDTO> body = ApiResponse.success("Expense created successfully!", product);
@@ -45,7 +45,7 @@ public class ProductController {
     }
 
     // Get All Products with Pagination and Custom Sorting
-    @GetMapping("/products")
+    @GetMapping
     public ResponseEntity<ApiResponse<List<ProductResponseDTO>>> getAllProducts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
