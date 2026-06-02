@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,6 +30,7 @@ public class CategoryController {
 
     // Create Category with JSR-380 validation
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ApiResponse<CategoryResponseDTO>> createCategory(@Valid @RequestBody CategoryRequestDTO requestDTO) {
         CategoryResponseDTO createdCategory = categoryService.createCategory(requestDTO);
         ApiResponse<CategoryResponseDTO> response = ApiResponse.success("Category created successfully", createdCategory);
@@ -37,6 +39,7 @@ public class CategoryController {
 
     // Get Single Category
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<ApiResponse<CategoryResponseDTO>> getCategoryById(@PathVariable Long id) {
         CategoryResponseDTO category = categoryService.getCategoryById(id);
         ApiResponse<CategoryResponseDTO> response = ApiResponse.success("Category found successfully", category);
@@ -45,6 +48,7 @@ public class CategoryController {
 
     // Get All Categories with Pagination & Sort properties
     @GetMapping
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<ApiResponse<List<CategoryResponseDTO>>> getAllCategories(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "id") String sortBy, @RequestParam(defaultValue = "asc") String sortDir) {
 
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
@@ -65,6 +69,7 @@ public class CategoryController {
 
     // Update Category
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ApiResponse<CategoryResponseDTO>> updateCategory(@PathVariable Long id, @Valid @RequestBody CategoryRequestDTO requestDTO) {
         CategoryResponseDTO updatedCategory = categoryService.updateCategory(id, requestDTO);
         ApiResponse<CategoryResponseDTO> response = ApiResponse.success("Category updated successfully", updatedCategory);
@@ -73,6 +78,7 @@ public class CategoryController {
 
     // Delete Category
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ApiResponse<String>> deleteCategory(@PathVariable Long id) {
         categoryService.deleteCategory(id);
         ApiResponse<String> response = ApiResponse.success("Category deleted successfully", "Deleted");

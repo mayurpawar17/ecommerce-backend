@@ -1,50 +1,40 @@
 package dev.mayur.ecommerce_backend.core.utils.config;
 
-import dev.mayur.ecommerce_backend.core.utils.dto.ApiResponse;
+import dev.mayur.ecommerce_backend.core.utils.security.CustomAccessDeniedHandler;
+import dev.mayur.ecommerce_backend.core.utils.security.CustomAuthenticationEntryPoint;
 import dev.mayur.ecommerce_backend.features.auth.jwt.JwtAuthFilter;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import tools.jackson.databind.ObjectMapper;
 
 @Configuration
 @RequiredArgsConstructor
+@EnableMethodSecurity
 public class SecurityConfig {
+    
     private final JwtAuthFilter jwtAuthFilter;
+    private final CustomAuthenticationEntryPoint authenticationEntryPoint;
+    private final CustomAccessDeniedHandler accessDeniedHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
-        http.csrf(AbstractHttpConfigurer::disable).sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)).authorizeHttpRequests(auth -> auth.requestMatchers("/api/v1/auth/**").permitAll().anyRequest().authenticated())
-
-
-                //THIS FIXES 401 vs 403 ISSUE
-                .exceptionHandling(ex -> ex.authenticationEntryPoint((request, response, authException) -> {
-//                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
-
-                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    response.setContentType("application/json");
-
-                    ApiResponse<Object> apiResponse = ApiResponse.error("Please login to continue");
-
-                    response.getWriter().write(mapper.writeValueAsString(apiResponse));
-                }).accessDeniedHandler((request, response, accessDeniedException) -> {
-
-                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                    response.setContentType("application/json");
-
-                    ApiResponse<Object> apiResponse = ApiResponse.error("Access denied");
-
-                    response.getWriter().write(new ObjectMapper().writeValueAsString(apiResponse));
-                }))
-
+        http.csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                        .anyRequest().authenticated()
+                )
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler)
+                )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

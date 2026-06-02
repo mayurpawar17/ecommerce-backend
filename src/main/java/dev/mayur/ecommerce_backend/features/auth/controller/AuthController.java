@@ -1,7 +1,6 @@
 package dev.mayur.ecommerce_backend.features.auth.controller;
 
 import dev.mayur.ecommerce_backend.core.utils.dto.ApiResponse;
-import dev.mayur.ecommerce_backend.core.utils.security.SecurityUtils;
 import dev.mayur.ecommerce_backend.features.auth.dto.AuthResponse;
 import dev.mayur.ecommerce_backend.features.auth.dto.LoginRequest;
 import dev.mayur.ecommerce_backend.features.auth.dto.RefreshRequest;
@@ -10,6 +9,7 @@ import dev.mayur.ecommerce_backend.features.auth.entity.RefreshToken;
 import dev.mayur.ecommerce_backend.features.auth.entity.User;
 import dev.mayur.ecommerce_backend.features.auth.jwt.JwtUtil;
 import dev.mayur.ecommerce_backend.features.auth.service.AuthService;
+import dev.mayur.ecommerce_backend.features.auth.service.CurrentUserService;
 import dev.mayur.ecommerce_backend.features.auth.service.RefreshTokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,8 +25,8 @@ public class AuthController {
 
     private final AuthService authService;
     private final JwtUtil jwtUtil;
-
     private final RefreshTokenService refreshTokenService;
+    private final CurrentUserService currentUserService;
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<AuthResponse>> register(@RequestBody RegisterRequest request) {
@@ -41,19 +41,21 @@ public class AuthController {
     }
 
     @GetMapping("/profile")
-    public ResponseEntity<?> getCurrentUser() {
-        User user = SecurityUtils.getCurrentUser();
-
-        Map<String, Object> data = Map.of("id", user.getId(), "email", user.getEmail());
-        return ResponseEntity.ok(ApiResponse.success("User Login successfully", data));
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getCurrentUser() {
+        User user = currentUserService.getCurrentUserOrThrow();
+        Map<String, Object> data = Map.of("id", user.getId(), "email", user.getEmail(), "role", user.getRole().name());
+        return ResponseEntity.ok(ApiResponse.success("User profile retrieved successfully", data));
     }
 
     @PostMapping("/refresh")
     public ResponseEntity<ApiResponse<AuthResponse>> refresh(@RequestBody RefreshRequest request) {
-
         RefreshToken refreshToken = refreshTokenService.verifyToken(request.getRefreshToken());
-
-        String newAccessToken = jwtUtil.generateToken(refreshToken.getUser().getEmail());
+        
+        // Generate new access token with the user's role claim
+        String newAccessToken = jwtUtil.generateToken(
+                refreshToken.getUser().getEmail(), 
+                refreshToken.getUser().getRole().name()
+        );
 
         AuthResponse data = new AuthResponse(newAccessToken, refreshToken.getToken(), refreshToken.getUser().getEmail());
 
@@ -61,11 +63,9 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout() {
-        User user = SecurityUtils.getCurrentUser();
-
+    public ResponseEntity<ApiResponse<Object>> logout() {
+        User user = currentUserService.getCurrentUserOrThrow();
         authService.logout(user);
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success("Logged out successfully", null));
-//        return ResponseEntity.ok("Logged out successfully");
     }
 }

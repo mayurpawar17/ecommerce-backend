@@ -2,7 +2,7 @@ package dev.mayur.ecommerce_backend.features.auth.jwt;
 
 import dev.mayur.ecommerce_backend.features.auth.entity.User;
 import dev.mayur.ecommerce_backend.features.auth.repo.UserRepository;
-import io.jsonwebtoken.lang.Collections;
+import dev.mayur.ecommerce_backend.features.auth.service.CustomUserDetails;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -54,9 +54,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         User user = userRepository.findByEmail(email).orElse(null);
 
-        if (user != null) {
+        if (user != null && user.isEnabled()) {
+            CustomUserDetails userDetails = new CustomUserDetails(user);
             UsernamePasswordAuthenticationToken auth =
-                    new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
+                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             auth.setDetails(new org.springframework.security.web.authentication.WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(auth);
         }

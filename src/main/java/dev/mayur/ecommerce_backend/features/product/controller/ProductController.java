@@ -12,11 +12,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+//@RequestMapping("/api/v1/products")
 @RequestMapping("/api/v1/products")
 public class ProductController {
 
@@ -28,6 +30,7 @@ public class ProductController {
 
     // Create Product with Validation
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<ProductResponseDTO>> createProduct(@Valid @RequestBody ProductRequestDTO requestDTO) {
         ProductResponseDTO createdProduct = productService.createProduct(requestDTO);
 
@@ -38,6 +41,7 @@ public class ProductController {
 
     // Get Single Product by ID
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<ApiResponse<ProductResponseDTO>> getProductById(@PathVariable Long id) {
         ProductResponseDTO product = productService.getProductById(id);
         ApiResponse<ProductResponseDTO> body = ApiResponse.success("Expense created successfully!", product);
@@ -46,6 +50,7 @@ public class ProductController {
 
     // Get All Products with Pagination and Custom Sorting
     @GetMapping
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<ApiResponse<List<ProductResponseDTO>>> getAllProducts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
