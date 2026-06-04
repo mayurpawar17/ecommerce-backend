@@ -11,7 +11,7 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ApiResponse<Object>> handleRuntime(RuntimeException ex) {
         return ResponseEntity.badRequest().body(ApiResponse.error(ex.getMessage()));
@@ -22,11 +22,11 @@ public class GlobalExceptionHandler {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
 
-        ApiResponse<Map<String, String>> apiResponse = ApiResponse.<Map<String, String>>builder()
-                .status("error")
-                .message("Validation failed")
-                .data(errors)
-                .build();
+        // TRADITIONAL WAY: Instantiate via standard constructor and setters
+        ApiResponse<Map<String, String>> apiResponse = new ApiResponse<>();
+        apiResponse.setStatus("error");
+        apiResponse.setMessage("Validation failed");
+        apiResponse.setData(errors);
 
         return ResponseEntity.badRequest().body(apiResponse);
     }

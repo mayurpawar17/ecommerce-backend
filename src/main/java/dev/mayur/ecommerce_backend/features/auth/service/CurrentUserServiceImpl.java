@@ -20,7 +20,7 @@ public class CurrentUserServiceImpl implements CurrentUserService {
         
         Object principal = authentication.getPrincipal();
         if (principal instanceof CustomUserDetails) {
-            return Optional.of(((CustomUserDetails) principal).user());
+            return Optional.of(((CustomUserDetails) principal).getUser());
         } else if (principal instanceof User) {
             return Optional.of((User) principal);
         }

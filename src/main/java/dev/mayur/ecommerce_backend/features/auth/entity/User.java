@@ -10,7 +10,6 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class User {
 
     @Id
@@ -27,6 +26,5 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @Builder.Default
     private boolean enabled = true;
 }

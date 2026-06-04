@@ -1,3 +1,4 @@
+/*
 package dev.mayur.ecommerce_backend.core.utils.security;
 
 import dev.mayur.ecommerce_backend.features.auth.entity.User;
@@ -14,10 +15,11 @@ public class SecurityUtils {
         }
         Object principal = authentication.getPrincipal();
         if (principal instanceof CustomUserDetails) {
-            return ((CustomUserDetails) principal).user();
+            return ((CustomUserDetails) principal).getUser();
         } else if (principal instanceof User) {
             return (User) principal;
         }
         return null;
     }
 }
+*/
