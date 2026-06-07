@@ -6,6 +6,7 @@ import dev.mayur.ecommerce_backend.features.product.dto.ProductRequestDTO;
 import dev.mayur.ecommerce_backend.features.product.dto.ProductResponseDTO;
 import dev.mayur.ecommerce_backend.features.product.service.ProductService;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,8 +19,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-//@RequestMapping("/api/v1/products")
 @RequestMapping("/api/v1/products")
+@Slf4j
 public class ProductController {
 
     private final ProductService productService;
