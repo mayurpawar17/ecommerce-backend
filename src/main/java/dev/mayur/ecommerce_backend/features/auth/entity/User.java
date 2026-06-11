@@ -27,4 +27,8 @@ public class User {
     private Role role;
 
     private boolean enabled = true;
+
+    // Stores uploaded avatar image URL/path
+    @Column(name = "avatar_url")
+    private String avatarUrl;
 }

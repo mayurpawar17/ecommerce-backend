@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
+@Getter
 @AllArgsConstructor
 public class CustomUserDetails implements UserDetails {
     private final User user;
@@ -21,10 +22,6 @@ public class CustomUserDetails implements UserDetails {
 
     public String getEmail() {
         return user.getEmail();
-    }
-
-    public User getUser() {
-        return user;
     }
 
     @Override

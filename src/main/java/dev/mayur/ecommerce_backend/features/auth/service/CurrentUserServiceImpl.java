@@ -17,7 +17,7 @@ public class CurrentUserServiceImpl implements CurrentUserService {
         if (authentication == null || !authentication.isAuthenticated()) {
             return Optional.empty();
         }
-        
+
         Object principal = authentication.getPrincipal();
         if (principal instanceof CustomUserDetails) {
             return Optional.of(((CustomUserDetails) principal).getUser());
@@ -29,14 +29,12 @@ public class CurrentUserServiceImpl implements CurrentUserService {
 
     @Override
     public User getCurrentUserOrThrow() {
-        return getCurrentUser()
-                .orElseThrow(() -> new ResourceNotFoundException("No authenticated user session found"));
+        return getCurrentUser().orElseThrow(() -> new ResourceNotFoundException("No authenticated user session found"));
     }
 
     @Override
     public boolean isAuthenticated() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return authentication != null && authentication.isAuthenticated() 
-                && !(authentication.getPrincipal() instanceof String && authentication.getPrincipal().equals("anonymousUser"));
+        return authentication != null && authentication.isAuthenticated() && !(authentication.getPrincipal() instanceof String && authentication.getPrincipal().equals("anonymousUser"));
     }
 }

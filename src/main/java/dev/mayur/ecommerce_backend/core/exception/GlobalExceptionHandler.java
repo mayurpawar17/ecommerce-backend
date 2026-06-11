@@ -1,6 +1,10 @@
 package dev.mayur.ecommerce_backend.core.exception;
 
+import dev.mayur.ecommerce_backend.core.exception.custom.FailedToDeleteException;
+import dev.mayur.ecommerce_backend.core.exception.custom.InvalidFileException;
+import dev.mayur.ecommerce_backend.core.exception.custom.UserNotFoundException;
 import dev.mayur.ecommerce_backend.core.utils.dto.ApiResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -28,6 +32,29 @@ public class GlobalExceptionHandler {
         apiResponse.setMessage("Validation failed");
         apiResponse.setData(errors);
 
-        return ResponseEntity.badRequest().body(apiResponse);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
+    }
+
+
+    // User not found maps to 404 Not Found
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ApiResponse<Object>> handleUserNotFoundException(UserNotFoundException ex) {
+        ApiResponse<Object> response = ApiResponse.error(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
+
+    // Invalid file maps to 404 Not Found
+    @ExceptionHandler(InvalidFileException.class)
+    public ResponseEntity<ApiResponse<Object>> handleInvalidException(InvalidFileException ex) {
+        ApiResponse<Object> response = ApiResponse.error(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
+    // Failed to delete maps to 404 Not Found
+    @ExceptionHandler(FailedToDeleteException.class)
+    public ResponseEntity<ApiResponse<Object>> handleFailedToDeleteException(FailedToDeleteException ex) {
+        ApiResponse<Object> response = ApiResponse.error(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 }
