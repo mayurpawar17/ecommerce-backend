@@ -11,16 +11,15 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 @Component
-public class    CustomAccessDeniedHandler implements AccessDeniedHandler {
+public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public void handle(HttpServletRequest request, HttpServletResponse response,
-                       AccessDeniedException accessDeniedException) throws IOException {
+    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException {
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         response.setContentType("application/json");
-        
+
         ApiResponse<Object> apiResponse = ApiResponse.error("Access denied: You do not have permission to access this resource");
         response.getWriter().write(objectMapper.writeValueAsString(apiResponse));
     }
