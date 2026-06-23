@@ -28,7 +28,7 @@ public class GlobalExceptionHandler {
 
         // TRADITIONAL WAY: Instantiate via standard constructor and setters
         ApiResponse<Map<String, String>> apiResponse = new ApiResponse<>();
-        apiResponse.setStatus("error");
+        apiResponse.setStatus(false);
         apiResponse.setMessage("Validation failed");
         apiResponse.setData(errors);
 

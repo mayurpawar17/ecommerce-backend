@@ -27,10 +27,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final UserRepository userRepository;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    @NonNull HttpServletResponse response,
-                                    @NonNull FilterChain filterChain)
-            throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
 
         log.debug("Request URI: {}", request.getRequestURI());
 
@@ -45,7 +42,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String token = header.substring(7);
 
         if (!jwtUtil.validateToken(token)) {
-            log.info("Invalid JWT Token");
+            log.error("Invalid JWT Token");
             filterChain.doFilter(request, response);
             return;
         }
@@ -56,8 +53,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         if (user != null && user.isEnabled()) {
             CustomUserDetails userDetails = new CustomUserDetails(user);
-            UsernamePasswordAuthenticationToken auth =
-                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             auth.setDetails(new org.springframework.security.web.authentication.WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(auth);
         }
